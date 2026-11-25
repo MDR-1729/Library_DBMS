@@ -1,0 +1,10 @@
+{% extends "base.html" %}{% block title %}Members · Shelfwise{% endblock %}
+{% block content %}
+<div class="page-heading"><div><p class="eyebrow">YOUR READING COMMUNITY</p><h1>Members</h1><p>Manage reader profiles and membership details.</p></div><a class="btn btn-primary" href="{% url 'member_create' %}">＋ Add a member</a></div>
+<section class="panel"><form class="toolbar" method="get"><div class="search-wrap"><input class="form-control search-input" name="q" value="{{ q }}" placeholder="Search name, member ID, email or phone…" aria-label="Search members"></div><button class="btn btn-outline-secondary">Search</button>{% if q %}<a href="{% url 'member_list' %}" class="btn btn-light">Clear</a>{% endif %}<span class="ms-auto small text-muted align-self-center">{{ result_count }} result{{ result_count|pluralize }}</span></form>
+<div class="table-responsive"><table class="table align-middle"><thead><tr><th>Member</th><th>Member ID</th><th>Email</th><th>Phone</th><th>Joined</th><th>Status</th><th class="text-end">Actions</th></tr></thead><tbody>
+{% for member in members %}<tr><td><div class="member-mini"><span class="member-avatar">{{ member.full_name|first|upper }}</span><strong>{{ member.full_name }}</strong></div></td><td>{{ member.member_id }}</td><td>{{ member.email }}</td><td>{{ member.phone|default:"—" }}</td><td>{{ member.joined_on|date:"d M Y" }}</td><td>{% if member.is_active %}<span class="status-pill returned">Active</span>{% else %}<span class="status-pill overdue">Inactive</span>{% endif %}</td><td class="text-end text-nowrap"><a class="btn btn-sm btn-light" href="{% url 'member_update' member.pk %}">Edit</a> <a class="btn btn-sm btn-outline-danger" href="{% url 'member_delete' member.pk %}">Delete</a></td></tr>
+{% empty %}<tr><td colspan="7"><div class="empty-state"><div class="empty-state-icon">♙</div><strong>No members found</strong><div>{% if q %}Try another search term.{% else %}Register your first library reader.{% endif %}</div></div></td></tr>{% endfor %}
+</tbody></table></div>
+{% include "library/pagination.html" %}
+</section>{% endblock %}

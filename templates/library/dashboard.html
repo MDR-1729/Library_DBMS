@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}Overview · Shelfwise{% endblock %}
+{% block content %}
+<section class="hero-panel">
+  <div class="hero-content">
+    <p class="eyebrow">YOUR LIBRARY, IN GOOD ORDER</p>
+    <h1>A better way to manage your library.</h1>
+    <p>Keep your collection organised, look after your members, and stay on top of every issue and return — all in one place.</p>
+    <div class="hero-actions"><a href="{% url 'loan_create' %}" class="btn btn-hero-light">＋ Issue a book</a><a href="{% url 'book_create' %}" class="btn btn-hero-outline">Add to collection</a></div>
+  </div>
+</section>
+<div class="page-heading mb-3"><div><p class="eyebrow">AT A GLANCE</p><h1>Library overview</h1><p>Your library activity and key numbers at a glance.</p></div></div>
+<div class="row g-3 mb-4">
+  <div class="col-6 col-xl"><div class="stat-card"><div class="stat-top"><div class="stat-icon purple">▤</div></div><p>Book titles</p><h2>{{ book_count }}</h2><span>{{ copy_count }} total copies</span></div></div>
+  <div class="col-6 col-xl"><div class="stat-card"><div class="stat-top"><div class="stat-icon blue">♙</div></div><p>Active members</p><h2>{{ member_count }}</h2><span>Registered readers</span></div></div>
+  <div class="col-6 col-xl"><div class="stat-card"><div class="stat-top"><div class="stat-icon green">↗</div></div><p>Books on loan</p><h2>{{ issued_count }}</h2><span>Currently borrowed</span></div></div>
+  <div class="col-6 col-xl"><div class="stat-card"><div class="stat-top"><div class="stat-icon orange">◷</div></div><p>Overdue loans</p><h2>{{ overdue_count }}</h2><span>Need attention</span></div></div>
+  <div class="col-12 col-xl"><div class="stat-card"><div class="stat-top"><div class="stat-icon red">₹</div></div><p>Calculated fines</p><h2>₹{{ total_fines|floatformat:2 }}</h2><span>₹5 per overdue day</span></div></div>
+</div>
+<div class="row g-4">
+  <div class="col-xl-8"><section class="panel h-100"><div class="panel-heading"><div><h2>Recent activity</h2><p>Your latest book transactions</p></div><a href="{% url 'loan_list' %}" class="text-link">All loans →</a></div>
+    {% if recent_loans %}<div class="table-responsive"><table class="table align-middle"><thead><tr><th>Book</th><th>Member</th><th>Due date</th><th>Status</th></tr></thead><tbody>
+    {% for loan in recent_loans %}<tr><td><div class="book-mini"><span class="book-cover">▤</span><div><strong>{{ loan.book.title }}</strong><div class="small text-muted">{{ loan.book.author }}</div></div></div></td><td>{{ loan.member.full_name }}</td><td>{{ loan.due_date|date:"d M Y" }}</td><td>{% if loan.status == "returned" %}<span class="status-pill returned">Returned</span>{% elif loan.is_overdue %}<span class="status-pill overdue">Overdue</span>{% else %}<span class="status-pill issued">Issued</span>{% endif %}</td></tr>{% endfor %}
+    </tbody></table></div>{% else %}<div class="empty-state"><div class="empty-state-icon">▤</div><strong>No activity yet</strong><div>Issue your first book to see transactions here.</div></div>{% endif %}
+  </section></div>
+  <div class="col-xl-4"><section class="panel h-100"><div class="panel-heading"><div><h2>Low availability</h2><p>Books with two or fewer copies left</p></div><a href="{% url 'book_list' %}" class="text-link">Catalog →</a></div>
+    {% for book in low_stock %}<div class="stock-row"><div><strong>{{ book.title }}</strong><div class="small text-muted">{{ book.author }}</div></div><span class="stock-count">{{ book.available_copies }} left</span></div>{% empty %}<div class="empty-state"><div class="empty-state-icon">✓</div><strong>Stock looks good</strong><div>No books are running low.</div></div>{% endfor %}
+  </section></div>
+</div>
+{% endblock %}

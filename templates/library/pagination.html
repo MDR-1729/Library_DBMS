@@ -1,0 +1,9 @@
+{% if page_obj and page_obj.paginator.num_pages > 1 %}
+<nav class="d-flex justify-content-between align-items-center flex-wrap gap-2 mt-3" aria-label="Pagination">
+  <span class="small text-muted">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+  <ul class="pagination mb-0">
+    {% if page_obj.has_previous %}<li class="page-item"><a class="page-link" href="?q={{ q|urlencode }}&status={{ status|default:''|urlencode }}&page=1">First</a></li><li class="page-item"><a class="page-link" href="?q={{ q|urlencode }}&status={{ status|default:''|urlencode }}&page={{ page_obj.previous_page_number }}">Previous</a></li>{% else %}<li class="page-item disabled"><span class="page-link">First</span></li>{% endif %}
+    {% if page_obj.has_next %}<li class="page-item"><a class="page-link" href="?q={{ q|urlencode }}&status={{ status|default:''|urlencode }}&page={{ page_obj.next_page_number }}">Next</a></li><li class="page-item"><a class="page-link" href="?q={{ q|urlencode }}&status={{ status|default:''|urlencode }}&page={{ page_obj.paginator.num_pages }}">Last</a></li>{% else %}<li class="page-item disabled"><span class="page-link">Last</span></li>{% endif %}
+  </ul>
+</nav>
+{% endif %}

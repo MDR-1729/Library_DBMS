@@ -1,0 +1,18 @@
+{% extends "base.html" %}{% block title %}Loans & returns · Shelfwise{% endblock %}
+{% block content %}
+<div class="page-heading"><div><p class="eyebrow">CIRCULATION DESK</p><h1>Loans & returns</h1><p>Track borrowed books, due dates, returns and automatically calculated fines.</p></div><a class="btn btn-primary" href="{% url 'loan_create' %}">＋ Issue a book</a></div>
+<section class="panel"><form class="toolbar" method="get"><div class="search-wrap"><input class="form-control search-input" name="q" value="{{ q }}" placeholder="Search book, member or member ID…" aria-label="Search loans"></div><select class="form-select status-select" name="status" aria-label="Filter by status"><option value="">All statuses</option><option value="issued" {% if status == 'issued' %}selected{% endif %}>Issued</option><option value="returned" {% if status == 'returned' %}selected{% endif %}>Returned</option></select><button class="btn btn-outline-secondary">Apply filters</button>{% if q or status %}<a href="{% url 'loan_list' %}" class="btn btn-light">Clear</a>{% endif %}<span class="ms-auto small text-muted align-self-center">{{ result_count }} record{{ result_count|pluralize }}</span></form>
+<div class="table-responsive"><table class="table align-middle"><thead><tr><th>Book</th><th>Member</th><th>Issued</th><th>Due date</th><th>Returned</th><th>Overdue</th><th>Fine</th><th>Status</th><th class="text-end">Action</th></tr></thead><tbody>
+{% for loan in loans %}<tr>
+<td><strong>{{ loan.book.title }}</strong><div class="small text-muted">{{ loan.book.author }}</div></td>
+<td>{{ loan.member.full_name }}<div class="small text-muted">{{ loan.member.member_id }}</div></td>
+<td>{{ loan.issue_date|date:"d M Y" }}</td><td>{{ loan.due_date|date:"d M Y" }}</td><td>{{ loan.return_date|date:"d M Y"|default:"—" }}</td>
+<td>{% if loan.overdue_days > 0 %}<span class="status-pill overdue">{{ loan.overdue_days }} days</span>{% else %}<span class="text-muted">0 days</span>{% endif %}</td>
+<td class="fw-bold">₹{{ loan.fine_amount|floatformat:2 }}</td>
+<td>{% if loan.status == "returned" %}<span class="status-pill returned">Returned</span>{% elif loan.is_overdue %}<span class="status-pill overdue">Overdue</span>{% else %}<span class="status-pill issued">Issued</span>{% endif %}</td>
+<td class="text-end">{% if loan.status == "issued" %}<form method="post" action="{% url 'loan_return' loan.pk %}" data-confirm="Mark this book as returned?">{% csrf_token %}<button class="btn btn-sm btn-outline-success">Mark returned</button></form>{% else %}<span class="text-muted small">Complete</span>{% endif %}</td>
+</tr>{% empty %}<tr><td colspan="9"><div class="empty-state"><div class="empty-state-icon">↗</div><strong>No loan records found</strong><div>Issue a book to create your first loan record.</div></div></td></tr>{% endfor %}
+</tbody></table></div>
+{% include "library/pagination.html" %}
+<p class="small text-muted mt-3 mb-0">Fine policy: ₹5 per overdue day. Fines are calculated automatically up to the return date, or today for books not yet returned.</p>
+</section>{% endblock %}
